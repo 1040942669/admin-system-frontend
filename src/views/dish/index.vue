@@ -45,16 +45,16 @@
                 @selection-change="handleSelectionChange">
         <el-table-column type="selection"
                          width="25" />
-        <el-table-column prop="name"
+        <el-table-column prop="Name"
                          label="菜品名称" />
         <el-table-column prop="categoryName"
                          label="菜品分类" />
         <el-table-column label="售价">
           <template slot-scope="scope">
-            <span style="margin-right: 10px">￥{{ (scope.row.price ).toFixed(2)*100/100 }}</span>
+            <span style="margin-right: 10px">￥{{ (scope.row.Price ).toFixed(2)*100/100 }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="updateTime"
+        <el-table-column prop="UpdatedAt"
                          label="最后操作时间" />
         <el-table-column label="操作"
                          width="250"
@@ -62,14 +62,8 @@
           <template slot-scope="scope">
             <el-button type="text"
                        size="small"
-                       class="blueBug"
-                       @click="addDishtype(scope.row.id)">
-              修改
-            </el-button>
-            <el-button type="text"
-                       size="small"
                        class="delBut"
-                       @click="deleteHandle('单删', scope.row.id)">
+                       @click="deleteHandle('单删', scope.row.DishId)">
               删除
             </el-button>
           </template>
@@ -97,11 +91,27 @@ import {
   editDish,
   deleteDish,
   dishStatusByStatus,
-  dishCategoryList
+  dishCategoryList,
+  getCategoryInfo
 } from '@/api/dish'
 import InputAutoComplete from '@/components/InputAutoComplete/index.vue'
 import Empty from '@/components/Empty/index.vue'
 import { baseUrl } from '@/config.json'
+
+interface Dish {
+  DishId: number;
+  Name: string;
+  Description: string;
+  Price: number;
+  CategoryID: number;
+  IsPopular: boolean;
+  ImageName: string;
+  ID: number;
+  CreatedAt: string;
+  UpdatedAt: string;
+  DeletedAt: string | null;
+  categoryName?: string; // 添加可选属性，用于存储分类名称
+}
 
 @Component({
   name: 'DishType',
@@ -117,16 +127,15 @@ export default class extends Vue {
   private page: number = 1
   private pageSize: number = 10
   private checkList: string[] = []
-  private tableData: [] = []
-  private dishState = ''
+  private tableData: Dish[] = [] // 将 tableData 声明为 Dish 数组
   private dishCategoryList = []
   private categoryId = ''
-  private dishStatus = ''
   private isSearch: boolean = false
+  private categoryCache: Record<number, string> = {} // 用于缓存分类名称
 
   created() {
-    this.init()
-    this.getDishCategoryList()
+    this.init();
+    this.getDishCategoryList();
   }
 
   initProp(val) {
@@ -147,15 +156,38 @@ export default class extends Vue {
       name: this.input || undefined,
       categoryId: this.categoryId || undefined,
     })
-      .then(res => {
-        if (res.data.code === 1) {
-          this.tableData = res.data && res.data.data && res.data.data.records
+      .then(async res => {
+        if (res.data.code === 0) {
+          this.tableData = res.data && res.data.data && res.data.data.dishes
           this.counts = Number(res.data.data.total)
+
+          // 获取每个菜品的分类名称并缓存
+          for (let dish of this.tableData) {
+            if (!this.categoryCache[dish.CategoryID]) {
+              await this.fetchCategoryName(dish.CategoryID)
+            }
+            this.$set(dish, 'categoryName', this.categoryCache[dish.CategoryID]); // 使用 Vue 的 $set 方法确保响应式
+          }
+        } else {
+          this.$message.error('获取菜品列表失败：' + res.data.message);
         }
       })
       .catch(err => {
         this.$message.error('请求出错了：' + err.message)
       })
+  }
+
+  private async fetchCategoryName(categoryId: number) {
+    try {
+      const res = await getCategoryInfo({ category_id: categoryId });
+      if (res.data.code === 0) {
+        this.$set(this.categoryCache, categoryId, res.data.data.category.Category); // 使用 Vue 的 $set 方法确保响应式
+      } else {
+        this.$message.error('获取分类详情失败：' + res.data.message);
+      }
+    } catch (err) {
+      this.$message.error('请求分类详情出错：' + err.message);
+    }
   }
 
   // 添加
@@ -193,7 +225,8 @@ export default class extends Vue {
         })
     })
   }
-  //获取菜品分类下拉数据
+
+  // 获取菜品分类下拉数据
   private getDishCategoryList() {
     dishCategoryList({})
       .then(res => {
@@ -230,11 +263,13 @@ export default class extends Vue {
   }
 }
 </script>
+
 <style lang="scss">
 .el-table-column--selection .cell {
   padding-left: 10px;
 }
 </style>
+
 <style lang="scss" scoped>
 .dashboard {
   &-container {

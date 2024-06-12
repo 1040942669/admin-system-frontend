@@ -8,7 +8,7 @@ import request from '@/utils/request'
 export const getDishPage = (params: any) => {
   return request({
     url: '/dish/list',
-    method: 'get',
+    method: 'post',
     params
   })
 }
@@ -16,7 +16,7 @@ export const getDishPage = (params: any) => {
 // 删除接口
 export const deleteDish = (ids: string) => {
   return request({
-    url: '/dish',
+    url: '/dish/delete',
     method: 'delete',
     params: { ids }
   })
@@ -34,7 +34,7 @@ export const editDish = (params: any) => {
 // 新增接口
 export const addDish = (params: any) => {
   return request({
-    url: '/dish',
+    url: '/dish/add',
     method: 'post',
     data: { ...params }
   })
@@ -45,15 +45,6 @@ export const queryDishById = (id: string | (string | null)[]) => {
   return request({
     url: `/dish/${id}`,
     method: 'get'
-  })
-}
-
-// 获取菜品分类列表
-export const getCategoryList = (params: any) => {
-  return request({
-    url: '/category/list',
-    method: 'get',
-    params
   })
 }
 
@@ -91,7 +82,16 @@ export const dishStatusByStatus = (params: any) => {
 export const dishCategoryList = (params: any) => {
   return request({
     url: `/category/list`,
-    method: 'get',
+    method: 'post',
     params: { ...params }
   })
 }
+
+// 获取分类详情
+export const getCategoryInfo = (params: any) => {
+  return request({
+    url: '/category/info',
+    method: 'post',
+    data: params,
+  });
+};

@@ -60,7 +60,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 // import {getDishTypeList, getDishListType} from '@/api/dish';
-import { getCategoryList, queryDishList } from '@/api/dish'
+import { queryDishList } from '@/api/dish'
 import Empty from '@/components/Empty/index.vue'
 
 @Component({
