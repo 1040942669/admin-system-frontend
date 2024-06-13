@@ -1,16 +1,6 @@
 <template>
   <div>
     <div class="logo">
-      <!-- <img
-        src="./../../../assets/logo.png"
-        width="122.5"
-        alt=""
-      > -->
-      <!-- <img
-        src="@/assets/login/login-logo.png"
-        alt=""
-        style="width: 120px; height: 31px"
-      /> -->
       <div v-if="!isCollapse"
            class="sidebar-logo">
         <img src="@/assets/login/logo.png"
@@ -36,19 +26,7 @@
                       :item="route"
                       :base-path="route.path"
                       :is-collapse="isCollapse" />
-        <!-- <div class="sub-menu">
-          <div class="avatarName">
-            {{ name }}
-          </div>
-          <div class="img">
-            <img
-              src="./../../../assets/icons/btn_close@2x.png"
-              class="outLogin"
-              alt="退出"
-              @click="logout"
-            />
-          </div>
-        </div> -->
+
       </el-menu>
     </el-scrollbar>
   </div>

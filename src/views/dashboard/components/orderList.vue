@@ -503,28 +503,21 @@ export default class extends Vue {
       value: 0,
     },
     {
-      label: '待付款',
+      label: '已付款',
       value: 1,
     },
     {
-      label: '待接单',
+      label: '已完成',
       value: 2,
     },
+
     {
-      label: '待派送',
+      label: '待退款',
       value: 3,
     },
     {
-      label: '派送中',
+      label: '已退款',
       value: 4,
-    },
-    {
-      label: '已完成',
-      value: 5,
-    },
-    {
-      label: '已取消',
-      value: 6,
     },
   ]
   get tabList() {

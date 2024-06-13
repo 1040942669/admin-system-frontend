@@ -113,26 +113,7 @@
               </div>
             </div>
           </div>
-          <!-- end -->
-          <!-- <div class="item" v-if="item.type === 4 && isActive && status === 1">
-            <div class="titAlready">
-              <div class="tit">
-                <span>【催单】</span>{{ item.arrNew[0] }}
-                <span class="time">{{ item.createTime }}</span>
-              </div>
-            </div>
-          </div> -->
-          <!-- 闭店 -->
-          <!-- <div class="item" v-if="item.type === 5 && isActive && status === 1">
-            <div class="titAlready">
-              <div class="tit">
-                <span>【今日数据】</span>认真工作的同时也要好好生活。<span
-                  class="time"
-                  >{{ item.createTime }}</span
-                >
-              </div>
-            </div>
-          </div> -->
+
           <div
             class="item"
             v-if="item.type === 5"

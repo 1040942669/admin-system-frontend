@@ -10,18 +10,6 @@
                   @clear="init"
                   @keyup.enter.native="initFun" />
 
-        <label style="margin-right: 10px; margin-left: 20px">菜品分类：</label>
-        <el-select v-model="categoryId"
-                   style="width: 14%"
-                   placeholder="请选择"
-                   clearable
-                   @clear="init">
-          <el-option v-for="item in dishCategoryList"
-                     :key="item.value"
-                     :label="item.label"
-                     :value="item.value" />
-        </el-select>
-
         <el-button class="normal-btn continue"
                    @click="init(true)">
           查询
@@ -71,7 +59,7 @@
       </el-table>
       <Empty v-else
              :is-search="isSearch" />
-      <el-pagination v-if="counts > 10"
+      <el-pagination v-if="counts > 0"
                      class="pageList"
                      :page-sizes="[10, 20, 30, 40]"
                      :page-size="pageSize"
@@ -85,18 +73,12 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import HeadLable from '@/components/HeadLable/index.vue'
 import {
   getDishPage,
-  editDish,
   deleteDish,
-  dishStatusByStatus,
   dishCategoryList,
   getCategoryInfo
 } from '@/api/dish'
-import InputAutoComplete from '@/components/InputAutoComplete/index.vue'
-import Empty from '@/components/Empty/index.vue'
-import { baseUrl } from '@/config.json'
 
 interface Dish {
   DishId: number;
@@ -110,46 +92,29 @@ interface Dish {
   CreatedAt: string;
   UpdatedAt: string;
   DeletedAt: string | null;
-  categoryName?: string; // 添加可选属性，用于存储分类名称
+  categoryName?: string;
 }
 
-@Component({
-  name: 'DishType',
-  components: {
-    HeadLable,
-    InputAutoComplete,
-    Empty
-  }
-})
-export default class extends Vue {
+@Component
+export default class DishType extends Vue {
   private input: any = ''
-  private counts: number = 0
+  private counts: number = 60 // 假设总记录数少于60条
   private page: number = 1
   private pageSize: number = 10
   private checkList: string[] = []
-  private tableData: Dish[] = [] // 将 tableData 声明为 Dish 数组
-  private dishCategoryList = []
-  private categoryId = ''
+  private tableData: Dish[] = []
+  private dishCategoryList: any[] = []
+  private categoryId: any = ''
   private isSearch: boolean = false
-  private categoryCache: Record<number, string> = {} // 用于缓存分类名称
+  private categoryCache: Record<number, string> = {}
 
   created() {
     this.init();
     this.getDishCategoryList();
   }
 
-  initProp(val) {
-    this.input = val
-    this.initFun()
-  }
-
-  initFun() {
-    this.page = 1
-    this.init()
-  }
-
   private async init(isSearch?) {
-    this.isSearch = isSearch
+    this.isSearch = isSearch;
     await getDishPage({
       page: this.page,
       pageSize: this.pageSize,
@@ -158,30 +123,34 @@ export default class extends Vue {
     })
       .then(async res => {
         if (res.data.code === 0) {
-          this.tableData = res.data && res.data.data && res.data.data.dishes
-          this.counts = Number(res.data.data.total)
+          this.tableData = res.data && res.data.data && res.data.data.dishes;
+          // 假设每页10条数据且返回数据不为空来估算总记录数
+          if (this.tableData.length > 0) {
+            this.counts = this.page * this.pageSize + 1;
+          }
+          console.log('Total counts:', this.counts);
+          console.log('Table data:', this.tableData);
 
-          // 获取每个菜品的分类名称并缓存
           for (let dish of this.tableData) {
             if (!this.categoryCache[dish.CategoryID]) {
-              await this.fetchCategoryName(dish.CategoryID)
+              await this.fetchCategoryName(dish.CategoryID);
             }
-            this.$set(dish, 'categoryName', this.categoryCache[dish.CategoryID]); // 使用 Vue 的 $set 方法确保响应式
+            this.$set(dish, 'categoryName', this.categoryCache[dish.CategoryID]);
           }
         } else {
           this.$message.error('获取菜品列表失败：' + res.data.message);
         }
       })
       .catch(err => {
-        this.$message.error('请求出错了：' + err.message)
-      })
+        this.$message.error('请求出错了：' + err.message);
+      });
   }
 
   private async fetchCategoryName(categoryId: number) {
     try {
       const res = await getCategoryInfo({ category_id: categoryId });
       if (res.data.code === 0) {
-        this.$set(this.categoryCache, categoryId, res.data.data.category.Category); // 使用 Vue 的 $set 方法确保响应式
+        this.$set(this.categoryCache, categoryId, res.data.data.category.Category);
       } else {
         this.$message.error('获取分类详情失败：' + res.data.message);
       }
@@ -190,20 +159,18 @@ export default class extends Vue {
     }
   }
 
-  // 添加
   private addDishtype(st: string) {
     if (st === 'add') {
-      this.$router.push({ path: '/dish/add' })
+      this.$router.push({ path: '/dish/add' });
     } else {
-      this.$router.push({ path: '/dish/add', query: { id: st } })
+      this.$router.push({ path: '/dish/add', query: { id: st } });
     }
   }
 
-  // 删除
   private deleteHandle(type: string, id: any) {
     if (type === '批量' && id === null) {
       if (this.checkList.length === 0) {
-        return this.$message.error('请选择删除对象')
+        return this.$message.error('请选择删除对象');
       }
     }
     this.$confirm('确认删除该菜品, 是否继续?', '确定删除', {
@@ -211,19 +178,20 @@ export default class extends Vue {
       cancelButtonText: '取消',
       type: 'warning'
     }).then(() => {
+      
       deleteDish(type === '批量' ? this.checkList.join(',') : id)
         .then(res => {
           if (res && res.data && res.data.code === 1) {
-            this.$message.success('删除成功！')
-            this.init()
+            this.$message.success('删除成功！');
+            this.init();
           } else {
-            this.$message.error(res.data.msg)
+            this.$message.error(res.data.msg);
           }
         })
         .catch(err => {
-          this.$message.error('请求出错了：' + err.message)
-        })
-    })
+          this.$message.error('请求出错了：' + err.message);
+        });
+    });
   }
 
   // 获取菜品分类下拉数据
@@ -231,35 +199,35 @@ export default class extends Vue {
     dishCategoryList({})
       .then(res => {
         if (res && res.data && res.data.code === 0) {
-          this.dishCategoryList = (
-            res.data &&
-            res.data.data &&
-            res.data.data
-          ).map(item => {
-            return { value: item.id, label: item.name }
-          })
+          this.dishCategoryList = res.data.data.categories.map((item: any) => ({
+            CategoryID: item.CategoryID,
+            Category: item.Category
+          }));
+        } else {
+          this.$message.error('获取菜品分类失败：' + res.data.message);
         }
       })
-      .catch(() => {})
+      .catch(err => {
+        this.$message.error('请求菜品分类出错：' + err.message);
+      });
   }
 
-  // 全部操作
   private handleSelectionChange(val: any) {
-    let checkArr: any[] = []
+    let checkArr: any[] = [];
     val.forEach((n: any) => {
-      checkArr.push(n.id)
-    })
-    this.checkList = checkArr
+      checkArr.push(n.id);
+    });
+    this.checkList = checkArr;
   }
 
   private handleSizeChange(val: any) {
-    this.pageSize = val
-    this.init()
+    this.pageSize = val;
+    this.init();
   }
 
   private handleCurrentChange(val: any) {
-    this.page = val
-    this.init()
+    this.page = val;
+    this.init();
   }
 }
 </script>

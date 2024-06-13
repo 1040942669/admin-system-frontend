@@ -67,14 +67,6 @@ const router = new Router({
           }
         },
         {
-          path: "setmeal",
-          component: () => import("@/views/setmeal/index.vue"),
-          meta: {
-            title: "套餐管理",
-            icon: "icon-combo"
-          }
-        },
-        {
           path: "dish",
           component: () => import("@/views/dish/index.vue"),
           meta: {
@@ -113,15 +105,6 @@ const router = new Router({
           component: () => import("@/views/employee/addEmployee.vue"),
           meta: {
             title: "添加/修改员工",
-            hidden: true
-          }
-        },
-        
-        {
-          path: "/setmeal/add",
-          component: () => import("@/views/setmeal/addSetmeal.vue"),
-          meta: {
-            title: "添加套餐",
             hidden: true
           }
         }

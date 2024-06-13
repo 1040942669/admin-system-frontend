@@ -5,74 +5,7 @@
                  :is-active="sidebar.opened"
                  class="hamburger-container"
                  @toggleClick="toggleSideBar" />
-      <span v-if="status===1"
-            class="businessBtn">营业中</span>
-      <span v-else
-            class="businessBtn closing">打烊中</span>
     </div>
-
-    <div :key="restKey"
-         class="right-menu">
-      <div class="rightStatus">
-        <audio ref="audioVo"
-               hidden>
-          <source src="./../../../assets/preview.mp3" type="audio/mp3" />
-        </audio>
-        <audio ref="audioVo2"
-               hidden>
-          <source src="./../../../assets/reminder.mp3" type="audio/mp3" />
-        </audio>
-        <span class="navicon operatingState" @click="handleStatus"><i />营业状态设置</span>
-      </div>
-      <div class="avatar-wrapper">
-        <div :class="shopShow?'userInfo':''"
-             @mouseenter="toggleShow"
-             @mouseleave="mouseLeaves">
-          <el-button type="primary"
-                     :class="shopShow?'active':''">
-            {{ name }}<i class="el-icon-arrow-down" />
-          </el-button>
-          <div v-if="shopShow"
-               class="userList">
-            <p class="amendPwdIcon"
-               @click="handlePwd">
-              修改密码<i />
-            </p>
-            <p class="outLogin"
-               @click="logout">
-              退出登录<i />
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- 营业状态弹层 -->
-    <el-dialog title="营业状态设置"
-               :visible.sync="dialogVisible"
-               width="25%"
-               :show-close="false">
-      <el-radio-group v-model="setStatus">
-        <el-radio :label="1">
-          营业中
-          <span>当前餐厅处于营业状态，自动接收任何订单，可点击打烊进入店铺打烊状态。</span>
-        </el-radio>
-        <el-radio :label="0">
-          打烊中
-          <span>当前餐厅处于打烊状态，仅接受营业时间内的预定订单，可点击营业中手动恢复营业状态。</span>
-        </el-radio>
-      </el-radio-group>
-      <span slot="footer"
-            class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary"
-                   @click="handleSave">确 定</el-button>
-      </span>
-    </el-dialog>
-    <!-- end -->
-    <!-- 修改密码 -->
-    <Password :dialog-form-visible="dialogFormVisible"
-              @handleclose="handlePwdClose" />
-    <!-- end -->
   </div>
 </template>
 
@@ -82,7 +15,6 @@ import { AppModule } from '@/store/modules/app'
 import { UserModule } from '@/store/modules/user'
 import Breadcrumb from '@/components/Breadcrumb/index.vue'
 import Hamburger from '@/components/Hamburger/index.vue'
-import { getStatus, setStatus } from '@/api/users'
 import Cookies from 'js-cookie'
 import { debounce, throttle } from '@/utils/common'
 import { setNewData, getNewData } from '@/utils/cookies'
@@ -156,7 +88,6 @@ export default class extends Vue {
     //     details: '434'
     //   }
     // }
-    this.getStatus()
   }
   created() {
     this.webSocket()
@@ -261,12 +192,6 @@ export default class extends Vue {
       this.$message.error(data.msg)
     }
   }
-  // 营业状态
-  async getStatus() {
-    const { data } = await getStatus()
-    this.status = data.data
-    this.setStatus = this.status
-  }
   // 下拉菜单显示
   toggleShow() {
     this.shopShow = true
@@ -279,18 +204,6 @@ export default class extends Vue {
   handleClose() {
     // clearTimeout(this.leave)
     // this.shopShow = false
-  }
-  // 设置营业状态
-  handleStatus() {
-    this.dialogVisible = true
-  }
-  // 营业状态设置
-  async handleSave() {
-    const { data } = await setStatus(this.setStatus)
-    if (data.code === 1) {
-      this.dialogVisible = false
-      this.getStatus()
-    }
   }
   // 修改密码
   handlePwd() {

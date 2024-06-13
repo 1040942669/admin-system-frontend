@@ -17,15 +17,6 @@
           @clear="init(orderStatus)"
           @keyup.enter.native="initFun(orderStatus)"
         />
-        <label style="margin-left: 20px">手机号：</label>
-        <el-input
-          v-model="phone"
-          placeholder="请填写手机号"
-          style="width: 15%"
-          clearable
-          @clear="init(orderStatus)"
-          @keyup.enter.native="initFun(orderStatus)"
-        />
         <label style="margin-left: 20px">下单时间：</label>
         <el-date-picker
           v-model="valueTime"
@@ -72,19 +63,6 @@
           prop="consignee"
           label="用户名"
           show-overflow-tooltip
-        />
-        <el-table-column
-          v-if="[0, 5, 6].includes(orderStatus)"
-          key="phone"
-          prop="phone"
-          label="手机号"
-        />
-        <el-table-column
-          v-if="[0, 2, 3, 4, 5, 6].includes(orderStatus)"
-          key="address"
-          prop="address"
-          label="地址"
-          :class-name="orderStatus === 6 ? 'address' : ''"
         />
         <el-table-column
           v-if="[0, 6].includes(orderStatus)"
@@ -271,10 +249,6 @@
                 <label>用户名：</label>
                 <span>{{ diaForm.consignee }}</span>
               </div>
-              <div class="user-phone">
-                <label>手机号：</label>
-                <span>{{ diaForm.phone }}</span>
-              </div>
               <div
                 v-if="[2, 3, 4, 5].includes(dialogOrderStatus)"
                 class="user-getTime"
@@ -287,10 +261,6 @@
                     ? diaForm.deliveryTime
                     : diaForm.estimatedDeliveryTime
                 }}</span>
-              </div>
-              <div class="user-address">
-                <label>地址：</label>
-                <span>{{ diaForm.address }}</span>
               </div>
             </div>
             <div
@@ -506,7 +476,6 @@ export default class extends Vue {
   private currentPageIndex = 0 //记录查看详情数据的index
   private orderId = '' //订单号
   private input = '' //搜索条件的订单号
-  private phone = '' //搜索条件的手机号
   private valueTime = []
   private dialogVisible = false //详情弹窗
   private cancelDialogVisible = false //取消，拒单弹窗
@@ -620,7 +589,6 @@ export default class extends Vue {
     if (activeIndex === this.orderStatus) return
     this.init(activeIndex)
     this.input = ''
-    this.phone = ''
     this.valueTime = []
     this.dialogOrderStatus = 0
     this.$router.push('/order')
@@ -648,7 +616,6 @@ export default class extends Vue {
       page: this.page,
       pageSize: this.pageSize,
       number: this.input || undefined,
-      phone: this.phone || undefined,
       beginTime:
         this.valueTime && this.valueTime.length > 0
           ? this.valueTime[0]
@@ -967,9 +934,6 @@ export default class extends Vue {
       .user-name {
         flex: 67%;
       }
-      .user-phone {
-        flex: 33%;
-      }
       .user-getTime {
         margin-top: 14px;
         flex: 80%;
@@ -980,14 +944,6 @@ export default class extends Vue {
       label {
         margin-right: 17px;
         color: #666;
-      }
-
-      .user-address {
-        margin-top: 14px;
-        flex: 80%;
-        label {
-          margin-right: 30px;
-        }
       }
     }
     .user-remark {
@@ -1124,85 +1080,6 @@ export default class extends Vue {
         }
       }
     }
-  }
-}
-</style>
-
-<style lang="scss">
-.dashboard-container {
-  .cancelReason {
-    padding-left: 40px;
-  }
-  .cancelTime {
-    padding-left: 50px;
-  }
-  .orderTime {
-    padding-left: 50px;
-  }
-  td.operate .cell {
-    .before,
-    .middle,
-    .after {
-      height: 39px;
-      width: 48px;
-    }
-  }
-  td.operate .cell,
-  td.otherOperate .cell {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: center;
-  }
-  .order-dialog {
-    .el-dialog {
-      max-height: 764px !important;
-      display: flex;
-      flex-direction: column;
-      margin: 0 !important;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      max-height: calc(100% - 30px);
-      max-width: calc(100% - 30px);
-    }
-    .el-dialog__body {
-      height: 520px !important;
-    }
-  }
-}
-.el-dialog__body {
-  padding-top: 34px;
-  padding-left: 30px;
-  padding-right: 30px;
-}
-.cancelDialog {
-  .el-dialog__body {
-    padding-left: 64px;
-  }
-  .el-select,
-  .el-textarea {
-    width: 293px;
-  }
-  .el-textarea textarea {
-    height: 114px;
-  }
-}
-.el-dialog__footer {
-  .el-checkbox {
-    float: left;
-    margin-left: 40px;
-  }
-  .el-checkbox__label {
-    color: #333333 !important;
-  }
-}
-.empty-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  img {
-    margin-top: 0 !important;
   }
 }
 </style>
