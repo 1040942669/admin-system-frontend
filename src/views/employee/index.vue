@@ -3,46 +3,40 @@ import { getEmployeeList } from '../../api/employee';
   <div class="dashboard-container">
     <div class="container">
       <div class="tableBar">
-        <label style="margin-right: 5px">
-          员工姓名: 
-        </label>
-        <el-input v-model="name" placeholder="请输入员工姓名" style="width: 15%" />
-        <el-button type="primary" style="margin-left: 25px" @click="pageQuery()">查询</el-button>
-        <el-button type="primary" style="float: right" @click="handleAddEmp">+添加员工</el-button>
+        <label style="margin-right: 5px"> 员工姓名: </label>
+        <el-input
+          v-model="name"
+          placeholder="请输入员工姓名"
+          style="width: 15%"
+        />
+        <el-button type="primary" style="margin-left: 25px" @click="pageQuery()"
+          >查询</el-button
+        >
+        <el-button type="primary" style="float: right" @click="handleAddEmp"
+          >+添加员工</el-button
+        >
       </div>
-      <el-table
-        :data="records"
-        stripe
-        style="width: 100%">
-        <el-table-column
-          prop="name"
-          label="员工姓名"
-          width="180">
+      <el-table :data="records" stripe style="width: 100%">
+        <el-table-column prop="name" label="员工姓名" width="180">
         </el-table-column>
-        <el-table-column
-          prop="username"
-          label="账号"
-          width="180">
+        <el-table-column prop="username" label="账号" width="180">
         </el-table-column>
-        <el-table-column
-          prop="phone"
-          label="手机号">
-        </el-table-column>
-        <el-table-column
-          prop="status"
-          label="账号状态">
+        <el-table-column prop="phone" label="手机号"> </el-table-column>
+        <el-table-column prop="status" label="账号状态">
           <template slot-scope="scope">
-            {{scope.row.status === 0 ? '禁用' : '启用'}}
+            {{ scope.row.status === 0 ? '禁用' : '启用' }}
           </template>
         </el-table-column>
-        <el-table-column
-          prop="updateTime"
-          label="最后操作数据">
+        <el-table-column prop="updateTime" label="最后操作数据">
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="text" @click="handleUpdateEmp(scope.row)">修改</el-button>
-            <el-button type="text" @click="handleStartOrStop(scope.row)">{{scope.row.status === 1 ? '禁用' : '启用'}}</el-button>
+            <el-button type="text" @click="handleUpdateEmp(scope.row)"
+              >修改</el-button
+            >
+            <el-button type="text" @click="handleStartOrStop(scope.row)">{{
+              scope.row.status === 1 ? '禁用' : '启用'
+            }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -54,15 +48,16 @@ import { getEmployeeList } from '../../api/employee';
         :page-sizes="[10, 20, 30, 40, 50]"
         :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="total">
+        :total="total"
+      >
       </el-pagination>
     </div>
   </div>
 </template>
 <script lang="ts">
-import {getEmployeeList} from '@/api/employee'
-import router from '@/router';
-export default  {
+import { getEmployeeList } from '@/api/employee'
+import router from '@/router'
+export default {
   //模型数据
   data() {
     return {
@@ -70,7 +65,7 @@ export default  {
       page: 1, //页码
       pageSize: 10, //每页记录数
       total: 0, //总记录数
-      records: [] //当前页要展示的数据集合
+      records: [], //当前页要展示的数据集合
     }
   },
   created() {
@@ -81,17 +76,23 @@ export default  {
     pageQuery() {
       //准备请求参数,参数分别为员工姓名、页码、每页记录数,通过对象的方式传递给后端服务
       //this是当前组件的实例对象，可以直接访问data中的数据
-      const params = {name:this.name,page:this.page,pageSize:this.pageSize}
+      const params = {
+        name: this.name,
+        page: this.page,
+        pageSize: this.pageSize,
+      }
 
       //发送Ajax请求，访问后端服务，获取分页数据
-      getEmployeeList(params).then(res => {
-        if(res.data.code === 1) {
-          this.total = res.data.data.total
-          this.records = res.data.data.records
-        }
-      }).catch(err => {
-        this.$message.error('请求出错了：' + err.message)
-      })
+      getEmployeeList(params)
+        .then((res) => {
+          if (res.data.code === 1) {
+            this.total = res.data.data.total
+            this.records = res.data.data.records
+          }
+        })
+        .catch((err) => {
+          this.$message.error('请求出错了：' + err.message)
+        })
     },
     //pageSize发生变化时触发
     handleSizeChange(pageSize) {
@@ -104,24 +105,24 @@ export default  {
       this.pageQuery()
     },
     //跳转到新增员工页面（组件）
-    handleAddEmp(){
+    handleAddEmp() {
       //路由跳转，跳转到新增员工组件
       this.$router.push('/employee/add')
     },
     //跳转到修改员工页面（组件）
     handleUpdateEmp(row) {
-      if(row.username === 'admin'){
+      if (row.username === 'admin') {
         this.$message.error('admin为系统的管理员账号，不能修改！')
-        return 
+        return
       }
 
       //跳转到修改页面，通过地址栏传递参数
       this.$router.push({
         path: '/employee/add',
-        query: {id: row.id}
+        query: { id: row.id },
       })
-    }
-  }
+    },
+  },
 }
 </script>
 

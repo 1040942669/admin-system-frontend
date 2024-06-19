@@ -51,8 +51,8 @@ export const queryDishById = (id: string | (string | null)[]) => {
 // 查菜品列表的接口
 export const queryDishList = (params: any) => {
   return request({
-    url: '/dish/list',
-    method: 'post',
+    url: '/dish/search',
+    method: 'get',
     params
   })
 }

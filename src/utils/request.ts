@@ -29,13 +29,14 @@ service.interceptors.request.use(
 )
 
 // Response interceptors
+//他的作用是在请求返回之后，先判断请求的状态码，如果是401则跳转到登录页，如果是405则提示请求错误
 service.interceptors.response.use(
   (response: any) => {
     // console.log(response, 'response')
     if (response.data.status === 401) {
       router.push('/login')
     }
-    //请求响应中的config的url会带上代理的api需要去掉
+    //为什么会带上代理的api呢？因为在vue.config.js中配置了代理-->所以请求响应中的config的url会带上代理的api需要去掉
     response.config.url = response.config.url.replace('/admin', '')
     // 请求完成，删除请求中状态
     const key = getRequestKey(response.config)

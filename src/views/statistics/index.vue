@@ -71,25 +71,25 @@ export default class extends Vue {
   private top10Data = {}
   created() {
     //this.init(this.flag)
-    this.getTitleNum(2);
+    this.getTitleNum(2)
   }
   // 获取基本数据
-  init(begin: any,end:any) {
+  init(begin: any, end: any) {
     this.$nextTick(() => {
-      this.getTurnoverStatisticsData(begin,end)
-      this.getUserStatisticsData(begin,end)
-      this.getOrderStatisticsData(begin,end)
-      this.getTopData(begin,end)
+      this.getTurnoverStatisticsData(begin, end)
+      this.getUserStatisticsData(begin, end)
+      this.getOrderStatisticsData(begin, end)
+      this.getTopData(begin, end)
     })
   }
 
   // 获取营业额统计数据
-  async getTurnoverStatisticsData(begin: any ,end:any) {
-    const data = await getTurnoverStatistics({ begin: begin,end:end })
+  async getTurnoverStatisticsData(begin: any, end: any) {
+    const data = await getTurnoverStatistics({ begin: begin, end: end })
     const turnoverData = data.data.data
     this.turnoverData = {
       dateList: turnoverData.dateList.split(','),
-      turnoverList: turnoverData.turnoverList.split(',')
+      turnoverList: turnoverData.turnoverList.split(','),
     }
     // this.tateData = this.turnoverData.date
     // const arr = []
@@ -101,8 +101,8 @@ export default class extends Vue {
     // this.tateData = arr
   }
   // 获取用户统计数据
-  async getUserStatisticsData(begin: any ,end:any) {
-    const data = await getUserStatistics({ begin: begin,end:end })
+  async getUserStatisticsData(begin: any, end: any) {
+    const data = await getUserStatistics({ begin: begin, end: end })
     const userData = data.data.data
     this.userData = {
       dateList: userData.dateList.split(','),
@@ -111,8 +111,8 @@ export default class extends Vue {
     }
   }
   // 获取订单统计数据
-  async getOrderStatisticsData(begin: any ,end:any) {
-    const data = await getOrderStatistics({begin: begin,end:end })
+  async getOrderStatisticsData(begin: any, end: any) {
+    const data = await getOrderStatistics({ begin: begin, end: end })
     const orderData = data.data.data
     this.orderData = {
       data: {
@@ -123,12 +123,12 @@ export default class extends Vue {
       },
       totalOrderCount: orderData.totalOrderCount,
       validOrderCount: orderData.validOrderCount,
-      orderCompletionRate: orderData.orderCompletionRate
+      orderCompletionRate: orderData.orderCompletionRate,
     }
   }
   // 获取排行数据
-  async getTopData(begin: any ,end:any) {
-    const data = await getTop({begin: begin,end:end })
+  async getTopData(begin: any, end: any) {
+    const data = await getTop({ begin: begin, end: end })
     const top10Data = data.data.data
     this.top10Data = {
       nameList: top10Data.nameList.split(',').reverse(),
@@ -155,7 +155,7 @@ export default class extends Vue {
         this.tateData = pastMonth()
         break
     }
-    this.init(this.tateData[0],this.tateData[1])
+    this.init(this.tateData[0], this.tateData[1])
   }
 }
 </script>

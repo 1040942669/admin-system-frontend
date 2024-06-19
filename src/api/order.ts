@@ -3,9 +3,34 @@ import request from '@/utils/request'
 // 查询列表页接口
 export const getOrderDetailPage = (params: any) => {
   return request({
-    url: '/order/conditionSearch',
-    method: 'get',
+    url: '/order/list',
+    method: 'post',
     params
+  })
+}
+
+export const deleteOrder = (params: any) => {
+  return request({
+    url: '/order/delete',
+    method: 'post',
+    data: { order_id: params.orderId }
+  })
+}
+
+export const confirmRefund = (params: any) => {
+  return request({
+    url: '/order/refund',
+    method: 'post',
+    data: { order_id: params.orderId }
+  })
+}
+
+
+export const finishOrder = (params: any) => {
+  return request({
+    url: '/order/finish',
+    method: 'post',
+    data: { order_id: params.orderId }
   })
 }
 

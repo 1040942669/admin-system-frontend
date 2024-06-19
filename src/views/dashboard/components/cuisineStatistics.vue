@@ -5,14 +5,6 @@
     </h2>
     <div class="orderviewBox">
       <ul>
-        <li>
-          <span class="status"><i class="iconfont icon-open"></i>已启售</span>
-          <span class="num">{{ dishesData.sold }}</span>
-        </li>
-        <li>
-          <span class="status"><i class="iconfont icon-stop"></i>已停售</span>
-          <span class="num">{{ dishesData.discontinued }}</span>
-        </li>
         <li class="add">
           <router-link to="/dish/add">
             <i></i>

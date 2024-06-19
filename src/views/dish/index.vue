@@ -7,11 +7,11 @@
                   placeholder="请填写菜品名称"
                   style="width: 14%"
                   clearable
-                  @clear="init"
-                  @keyup.enter.native="initFun" />
+                  @clear="queryDishList"
+                   />
 
         <el-button class="normal-btn continue"
-                   @click="init(true)">
+                   @click="queryDishList">
           查询
         </el-button>
 
@@ -77,7 +77,8 @@ import {
   getDishPage,
   deleteDish,
   dishCategoryList,
-  getCategoryInfo
+  getCategoryInfo,
+  queryDishList
 } from '@/api/dish'
 
 interface Dish {
@@ -146,6 +147,25 @@ export default class DishType extends Vue {
       });
   }
 
+  //根据当前菜品列表，按照菜品名称查询菜品
+  private async queryDishList() {
+    queryDishList({ 
+      keyword: this.input,
+      page: this.page,
+      pageSize: this.pageSize
+       })
+      .then(res => {
+        if (res && res.data && res.data.code === 0) {
+          this.tableData = res.data.data.dishes;
+        } else {
+          this.$message.error('查询菜品失败：' + res.data.message);
+        }
+      })
+      .catch(err => {
+        this.$message.error('请求查询菜品出错：' + err.message);
+      });
+  }
+
   private async fetchCategoryName(categoryId: number) {
     try {
       const res = await getCategoryInfo({ category_id: categoryId });
@@ -179,9 +199,9 @@ export default class DishType extends Vue {
       type: 'warning'
     }).then(() => {
       
-      deleteDish(type === '批量' ? this.checkList.join(',') : id)
+      deleteDish(id)
         .then(res => {
-          if (res && res.data && res.data.code === 1) {
+          if (res && res.data && res.data.code === 0) {
             this.$message.success('删除成功！');
             this.init();
           } else {

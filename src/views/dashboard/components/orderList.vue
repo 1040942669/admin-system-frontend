@@ -523,12 +523,12 @@ export default class extends Vue {
   get tabList() {
     return [
       {
-        label: '待接单',
+        label: '待完成',
         value: 2,
         num: this.orderStatics.toBeConfirmed,
       },
       {
-        label: '待派送',
+        label: '待退款',
         value: 3,
         num: this.orderStatics.confirmed,
       },
@@ -699,6 +699,8 @@ export default class extends Vue {
   }
 }
 </script>
+
+
 <style  lang="scss" scoped >
 .dashboard-container.home .homecon {
   margin-bottom: 0;
