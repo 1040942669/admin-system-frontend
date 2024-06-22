@@ -25,7 +25,7 @@ export const deleteDish = (id: number) => {
 // 修改接口
 export const editDish = (params: any) => {
   return request({
-    url: '/dish',
+    url: '/dish/update',
     method: 'put',
     data: { ...params }
   })
@@ -37,14 +37,6 @@ export const addDish = (params: any) => {
     url: '/dish/add',
     method: 'post',
     data: { ...params }
-  })
-}
-
-// 查询详情
-export const queryDishById = (id: string | (string | null)[]) => {
-  return request({
-    url: `/dish/${id}`,
-    method: 'get'
   })
 }
 

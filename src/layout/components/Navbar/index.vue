@@ -19,8 +19,7 @@ import Cookies from 'js-cookie'
 import { debounce, throttle } from '@/utils/common'
 import { setNewData, getNewData } from '@/utils/cookies'
 
-// 接口
-import { getCountUnread } from '@/api/inform'
+
 // 修改密码弹层
 import Password from '../components/password.vue'
 
@@ -80,14 +79,6 @@ export default class extends Vue {
   }
   mounted() {
     document.addEventListener('click', this.handleClose)
-    //console.log(this.$store.state.app.statusNumber)
-    // const msg = {
-    //   data: {
-    //     type: 2,
-    //     content: '订单1653904906519客户催单，已下单23分钟，仍未接单。',
-    //     details: '434'
-    //   }
-    // }
   }
   created() {
     this.webSocket()
@@ -180,18 +171,6 @@ export default class extends Vue {
     })
     // this.$router.push(`/login?redirect=${this.$route.fullPath}`)
   }
-  // 获取未读消息
-  async getCountUnread() {
-    const { data } = await getCountUnread()
-    if (data.code === 1) {
-      // this.ountUnread = data.data
-      AppModule.StatusNumber(data.data)
-      // setNewData(data.data)
-      // this.$message.success('操作成功！')
-    } else {
-      this.$message.error(data.msg)
-    }
-  }
   // 下拉菜单显示
   toggleShow() {
     this.shopShow = true
@@ -221,7 +200,7 @@ export default class extends Vue {
   height: 60px;
   // overflow: hidden;
   position: relative;
-  background: #ffc100;
+  background: #ff2f00;
 
   // box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
   .statusBox {

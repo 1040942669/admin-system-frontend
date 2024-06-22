@@ -1,18 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Layout from "@/layout/index.vue";
-// import {
-//   getToken,
-//   setToken,
-//   removeToken,
-//   getStoreId,
-//   setStoreId,
-//   removeStoreId,
-//   setUserInfo,
-//   getUserInfo,
-//   removeUserInfo
-// } from "@/utils/cookies";
-// import store from "@/store";
+
 
 Vue.use(Router);
 
@@ -38,26 +27,8 @@ const router = new Router({
     {
       path: "/",
       component: Layout,
-      redirect: "/dashboard",
+      redirect: "/order",
       children: [
-        {
-          path: "dashboard",
-          component: () =>  import("@/views/dashboard/index.vue"),
-          name: "Dashboard",
-          meta: {
-            title: "工作台",
-            icon: "dashboard",
-            affix: true
-          }
-        },
-		    {
-          path: "/statistics",
-          component: () => import("@/views/statistics/index.vue"),
-          meta: {
-            title: "数据统计",
-            icon: "icon-statistics"
-          }
-        },
         {
           path: "order",
           component: () => import("@/views/orderDetails/index.vue"),
@@ -82,7 +53,6 @@ const router = new Router({
             hidden: true
           }
         },
-        
         {
           path: "category",
           component: () => import("@/views/category/index.vue"),

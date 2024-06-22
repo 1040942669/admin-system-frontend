@@ -222,6 +222,4 @@ export default class extends Vue {
 </style>
 
 
-function deleteOrder(orderId: number) {
-  throw new Error('Function not implemented.');
-}
+

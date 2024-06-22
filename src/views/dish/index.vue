@@ -50,6 +50,13 @@
           <template slot-scope="scope">
             <el-button type="text"
                        size="small"
+                       class="editBut"
+                       @click="updateDish(scope.row.DishId)">
+              修改
+            </el-button>
+
+            <el-button type="text"
+                       size="small"
                        class="delBut"
                        @click="deleteHandle('单删', scope.row.DishId)">
               删除
@@ -178,6 +185,9 @@ export default class DishType extends Vue {
       this.$message.error('请求分类详情出错：' + err.message);
     }
   }
+
+  // 修改菜品
+  private async 
 
   private addDishtype(st: string) {
     if (st === 'add') {
