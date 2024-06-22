@@ -134,16 +134,6 @@ class User extends VuexModule implements IUserState {
     this.SET_INTRODUCTION(introduction)
   }
 
-  @Action
-  public async LogOut () {
-    const { data } = await userLogout({})
-    removeToken()
-    this.SET_TOKEN('')
-    this.SET_ROLES([])
-    Cookies.remove('username')
-    Cookies.remove('user_info')
-    removeUserInfo()
-  }
 }
 
 export const UserModule = getModule(User)
