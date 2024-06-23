@@ -53,7 +53,6 @@
 import { Component, Vue } from 'vue-property-decorator';
 import {
   addDish,
-  editDish,
   dishCategoryList
 } from '@/api/dish';
 import { getToken } from '@/utils/cookies';
@@ -64,7 +63,7 @@ import { getToken } from '@/utils/cookies';
 export default class extends Vue {
   private restKey: number = 0;
   private value: string = '';
-  private actionType: string = '';
+  private actionType: string = 'add';
   private dishList: any[] = []; // 将 dishList 定义为数组
   private vueRest = '1';
   private headers = {
@@ -125,21 +124,6 @@ export default class extends Vue {
 
   created() {
     this.getDishList();
-    this.actionType = this.$route.query.id ? 'edit' : 'add';
-    if (this.$route.query.id) {
-      this.init();
-    }
-  }
-
-  private async init() {
-    queryDishById(this.$route.query.id).then(res => {
-      if (res && res.data && res.data.code === 1) {
-        this.ruleForm = { ...res.data.data };
-        this.ruleForm.price = String(res.data.data.price);
-      } else {
-        this.$message.error(res.data.msg);
-      }
-    });
   }
 
   // 获取菜品分类
@@ -154,18 +138,17 @@ export default class extends Vue {
   }
 
   private submitForm(formName: any, st: any) {
-  ;(this.$refs[formName] as any).validate((valid: any) => {
-    if (valid) {
-      const categoryItem = this.dishList.find(item => item.CategoryID === this.ruleForm.categoryId);
-      const category = categoryItem ? categoryItem.Category : '';
+    (this.$refs[formName] as any).validate((valid: any) => {
+      if (valid) {
+        const categoryItem = this.dishList.find(item => item.CategoryID === this.ruleForm.categoryId);
+        const category = categoryItem ? categoryItem.Category : '';
 
-      let params: any = {
-        name: this.ruleForm.name,
-        price: parseFloat(this.ruleForm.price), // 确保 price 是数值型（浮点数）
-        category: category
-      };
+        let params: any = {
+          name: this.ruleForm.name,
+          price: parseFloat(this.ruleForm.price), // 确保 price 是数值型（浮点数）
+          category: category
+        };
 
-      if (this.actionType == 'add') {
         addDish(params)
           .then(res => {
             if (res.data.code === 0) {
@@ -190,25 +173,10 @@ export default class extends Vue {
             this.$message.error('请求出错了：' + err.message);
           });
       } else {
-        editDish(params)
-          .then(res => {
-            if (res && res.data && res.data.code === 1) {
-              this.$router.push({ path: '/dish' });
-              this.$message.success('菜品修改成功！');
-            } else {
-              this.$message.error(res.data.desc || res.data.msg);
-            }
-          })
-          .catch(err => {
-            this.$message.error('请求出错了：' + err.message);
-          });
+        return false;
       }
-    } else {
-      return false;
-    }
-  });
-}
-
+    });
+  }
 }
 </script>
 

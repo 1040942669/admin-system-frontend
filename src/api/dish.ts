@@ -18,18 +18,18 @@ export const deleteDish = (id: number) => {
   return request({
     url: '/dish/delete',
     method: 'delete',
-    params: { id: id }
+    data: { id: id }
   })
 }
 
 // 修改接口
-export const editDish = (params: any) => {
+export const editDish = (params: any, id: number) => {
   return request({
-    url: '/dish/update',
+    url: `/dish/update?id=${id}`,
     method: 'put',
     data: { ...params }
-  })
-}
+  });
+};
 
 // 新增接口
 export const addDish = (params: any) => {

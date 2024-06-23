@@ -51,7 +51,7 @@
             <el-button type="text"
                        size="small"
                        class="editBut"
-                       @click="updateDish(scope.row.DishId)">
+                       @click="editDish(scope.row)">
               修改
             </el-button>
 
@@ -74,9 +74,32 @@
                      :total="counts"
                      @size-change="handleSizeChange"
                      @current-change="handleCurrentChange" />
+      
+      <!-- 添加修改菜品的对话框 -->
+      <el-dialog title="修改菜品" :visible.sync="editDialogVisible">
+        <el-form :model="editForm" label-width="100px">
+          <el-form-item label="菜品名称">
+            <el-input v-model="editForm.name"></el-input>
+          </el-form-item>
+          <el-form-item label="描述">
+            <el-input v-model="editForm.description"></el-input>
+          </el-form-item>
+          <el-form-item label="价格">
+            <el-input v-model="editForm.price" type="number"></el-input>
+          </el-form-item>
+          <el-form-item label="是否热门">
+            <el-switch v-model="editForm.is_popular"></el-switch>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitEditForm">确定</el-button>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
+
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
@@ -85,7 +108,8 @@ import {
   deleteDish,
   dishCategoryList,
   getCategoryInfo,
-  queryDishList
+  queryDishList,
+  editDish
 } from '@/api/dish'
 
 interface Dish {
@@ -109,16 +133,23 @@ export default class DishType extends Vue {
   private counts: number = 60 // 假设总记录数少于60条
   private page: number = 1
   private pageSize: number = 10
-  private checkList: string[] = []
+  private checkList: number[] = [] // 用于存储选中的菜品ID
   private tableData: Dish[] = []
-  private dishCategoryList: any[] = []
   private categoryId: any = ''
   private isSearch: boolean = false
   private categoryCache: Record<number, string> = {}
+  private editDialogVisible: boolean = false
+  private editForm: any = {
+    name: '',
+    description: '',
+    price: 0.0,
+    is_popular: false
+  }
+  private currentDishId: number | null = null
 
   created() {
     this.init();
-    this.getDishCategoryList();
+    
   }
 
   private async init(isSearch?) {
@@ -154,7 +185,7 @@ export default class DishType extends Vue {
       });
   }
 
-  //根据当前菜品列表，按照菜品名称查询菜品
+  // 根据当前菜品列表，按照菜品名称查询菜品
   private async queryDishList() {
     queryDishList({ 
       keyword: this.input,
@@ -186,9 +217,6 @@ export default class DishType extends Vue {
     }
   }
 
-  // 修改菜品
-  private async 
-
   private addDishtype(st: string) {
     if (st === 'add') {
       this.$router.push({ path: '/dish/add' });
@@ -197,65 +225,94 @@ export default class DishType extends Vue {
     }
   }
 
-  private deleteHandle(type: string, id: any) {
+  private async deleteHandle(type: string, id: number | null) { // id类型为number或null
     if (type === '批量' && id === null) {
       if (this.checkList.length === 0) {
         return this.$message.error('请选择删除对象');
       }
-    }
-    this.$confirm('确认删除该菜品, 是否继续?', '确定删除', {
-      confirmButtonText: '删除',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }).then(() => {
-      
-      deleteDish(id)
-        .then(res => {
-          if (res && res.data && res.data.code === 0) {
+      this.$confirm('确认删除所选菜品, 是否继续?', '确定删除', {
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await Promise.all(this.checkList.map(async (dishId) => {
+            console.log(`Deleting dish with ID: ${dishId}`); // 打印删除的菜品ID
+            const res = await deleteDish(dishId);
+            if (res.data.code !== 0) {
+              throw new Error(res.data.message);
+            }
+          }));
+          this.$message.success('批量删除成功！');
+          this.init();
+        } catch (err) {
+          this.$message.error('批量删除出错：' + err.message);
+        }
+      });
+    } else if (type === '单删' && id !== null) { // 单个删除逻辑
+      this.$confirm('确认删除该菜品, 是否继续?', '确定删除', {
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          console.log(`Deleting dish with ID: ${id}`); // 打印删除的菜品ID
+          const res = await deleteDish(id);
+          if (res.data.code === 0) {
             this.$message.success('删除成功！');
             this.init();
           } else {
             this.$message.error(res.data.msg);
           }
-        })
-        .catch(err => {
+        } catch (err) {
           this.$message.error('请求出错了：' + err.message);
-        });
-    });
-  }
-
-  // 获取菜品分类下拉数据
-  private getDishCategoryList() {
-    dishCategoryList({})
-      .then(res => {
-        if (res && res.data && res.data.code === 0) {
-          this.dishCategoryList = res.data.data.categories.map((item: any) => ({
-            CategoryID: item.CategoryID,
-            Category: item.Category
-          }));
-        } else {
-          this.$message.error('获取菜品分类失败：' + res.data.message);
         }
-      })
-      .catch(err => {
-        this.$message.error('请求菜品分类出错：' + err.message);
       });
+    }
   }
 
-  private handleSelectionChange(val: any) {
-    let checkArr: any[] = [];
-    val.forEach((n: any) => {
-      checkArr.push(n.id);
-    });
-    this.checkList = checkArr;
+  private editDish(dish: Dish) {
+    this.currentDishId = dish.DishId;
+    this.editForm = {
+      name: dish.Name,
+      description: dish.Description,
+      price: dish.Price,
+      is_popular: dish.IsPopular,
+    };
+    this.editDialogVisible = true;
   }
 
-  private handleSizeChange(val: any) {
+private async submitEditForm() {
+  if (this.currentDishId !== null) {
+    // 将 price 转换为数值类型，确保支持小数位
+    this.editForm.price = parseFloat(this.editForm.price);
+    try {
+      const res = await editDish(this.editForm, this.currentDishId);
+      if (res.data.code === 0) {
+        this.$message.success('修改成功！');
+        this.editDialogVisible = false;
+        this.init();
+      } else {
+        this.$message.error('修改失败：' + res.data.message);
+      }
+    } catch (err) {
+      this.$message.error('请求出错了：' + err.message);
+    }
+  }
+}
+
+
+
+  private handleSelectionChange(val: Dish[]) {
+    this.checkList = val.map(row => row.DishId);
+  }
+
+  private handleSizeChange(val: number) {
     this.pageSize = val;
     this.init();
   }
 
-  private handleCurrentChange(val: any) {
+  private handleCurrentChange(val: number) {
     this.page = val;
     this.init();
   }

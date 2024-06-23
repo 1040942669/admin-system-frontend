@@ -20,15 +20,12 @@ import { debounce, throttle } from '@/utils/common'
 import { setNewData, getNewData } from '@/utils/cookies'
 
 
-// 修改密码弹层
-import Password from '../components/password.vue'
 
 @Component({
   name: 'Navbar',
   components: {
     Breadcrumb,
     Hamburger,
-    Password,
   },
 })
 export default class extends Vue {
@@ -80,96 +77,11 @@ export default class extends Vue {
   mounted() {
     document.addEventListener('click', this.handleClose)
   }
-  created() {
-    this.webSocket()
-  }
   onload() {
-  }
-  destroyed() {
-    this.websocket.close() //离开路由之后断开websocket连接
-  }
-
-  // 添加新订单提示弹窗
-  webSocket() {
-    const that = this as any
-    let clientId = Math.random().toString(36).substr(2)
-    let socketUrl = process.env.VUE_APP_SOCKET_URL + clientId
-    console.log(socketUrl, 'socketUrl')
-    if (typeof WebSocket == 'undefined') {
-      that.$notify({
-        title: '提示',
-        message: '当前浏览器无法接收实时报警信息，请使用谷歌浏览器！',
-        type: 'warning',
-        duration: 0,
-      })
-    } else {
-      this.websocket = new WebSocket(socketUrl)
-      // 监听socket打开
-      this.websocket.onopen = function () {
-        console.log('浏览器WebSocket已打开')
-      }
-      // 监听socket消息接收
-      this.websocket.onmessage = function (msg) {
-        // 转换为json对象
-        that.$refs.audioVo.currentTime = 0
-        that.$refs.audioVo2.currentTime = 0
-
-        console.log(msg, JSON.parse(msg.data), 'msg')
-        // const h = this.$createElement
-        const jsonMsg = JSON.parse(msg.data)
-        if (jsonMsg.type === 1) {
-          that.$refs.audioVo.play()
-        } else if (jsonMsg.type === 2) {
-          that.$refs.audioVo2.play()
-        }
-        that.$notify({
-          title: jsonMsg.type === 1 ? '待接单' : '催单',
-          duration: 0,
-          dangerouslyUseHTMLString: true,
-          onClick: () => {
-            that.$router
-              .push(`/order?orderId=${jsonMsg.orderId}`)
-              .catch((err) => {
-                console.log(err)
-              })
-            setTimeout(() => {
-              location.reload()
-            }, 100)
-          },
-          // 这里也可以把返回信息加入到message中显示
-          message: `${
-            jsonMsg.type === 1
-              ? `<span>您有1个<span style=color:#419EFF>订单待处理</span>,${jsonMsg.content},请及时接单</span>`
-              : `${jsonMsg.content}<span style='color:#419EFF;cursor: pointer'>去处理</span>`
-          }`,
-        })
-      }
-      // 监听socket错误
-      this.websocket.onerror = function () {
-        that.$notify({
-          title: '错误',
-          message: '服务器错误，无法接收实时报警信息',
-          type: 'error',
-          duration: 0,
-        })
-      }
-      // 监听socket关闭
-      this.websocket.onclose = function () {
-        console.log('WebSocket已关闭')
-      }
-    }
   }
 
   private toggleSideBar() {
     AppModule.ToggleSideBar(false)
-  }
-  // 退出
-  private async logout() {
-    this.$store.dispatch('LogOut').then(() => {
-      // location.href = '/'
-      this.$router.replace({ path: '/login' })
-    })
-    // this.$router.push(`/login?redirect=${this.$route.fullPath}`)
   }
   // 下拉菜单显示
   toggleShow() {
@@ -184,14 +96,7 @@ export default class extends Vue {
     // clearTimeout(this.leave)
     // this.shopShow = false
   }
-  // 修改密码
-  handlePwd() {
-    this.dialogFormVisible = true
-  }
-  // 关闭密码编辑弹层
-  handlePwdClose() {
-    this.dialogFormVisible = false
-  }
+
 }
 </script>
 
@@ -529,22 +434,5 @@ export default class extends Vue {
   color: #419eff;
   padding: 0 5px;
 }
-// .el-dropdown{
-//   .el-button--primary{
-//     height: 32px;
-//     background: rgba(255,255,255,0.52);
-//     border-radius: 4px;
-//     padding-top: 0px;
-//     padding-bottom: 0px;
-//   }
-//   margin-top: 2px;
-// }
-// .el-popper{
-//   top: 45px !important;
-//   padding-top: 50px !important;
-//   border-radius: 0 0 4px 4px;
-// }
-// .el-popper[x-placement^=bottom] .popper__arrow::after,.popper__arrow{
-//   display: none !important;
-// }
+
 </style>
